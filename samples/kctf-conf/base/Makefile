@@ -227,22 +227,6 @@ ${CLUSTER_GEN}/image-pushed: .gen/challenge-image | .cluster-config
 healthcheck/.gen/docker-image: ../kctf-conf/base/healthcheck-docker/.gen/docker-image .FORCE
 	$(MAKE) -C healthcheck .gen/docker-image
 
-${CLUSTER_GEN}/image-pushed: .gen/challenge-image | .cluster-config
-	IMAGE_ID="$$(cat .gen/challenge-image)"
-	if [[ "$${IMAGE_ID}" = "$${REMOTE_IMAGE}:"* ]]; then
-	  IMAGE_TAG="$${IMAGE_ID}"
-	else
-	  IMAGE_TAG="${REMOTE_IMAGE}:$${IMAGE_ID}"
-	  docker tag "$${IMAGE_ID}" "$${IMAGE_TAG}"
-	  if [ "${PUSH_TARGET}" == "REMOTE" ]; then
-	    docker push "$${IMAGE_TAG}"
-	  fi
-	fi
-	if [ "${PUSH_TARGET}" == "KIND" ]; then
-	  kind load docker-image "$${IMAGE_TAG}"
-	fi
-	echo -n "$${IMAGE_TAG}" > $@
-
 ${CLUSTER_GEN}/healthcheck-image-pushed: .gen/healthcheck-image | .cluster-config
 	IMAGE_ID="$$(cat .gen/healthcheck-image)"
 	if [[ "$${IMAGE_ID}" = "$${REMOTE_IMAGE}:"* ]]; then
